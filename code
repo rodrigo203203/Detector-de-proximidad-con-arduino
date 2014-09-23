@@ -1,0 +1,54 @@
+#include <NewPing.h>
+#include <LiquidCrystal.h>
+#include <LiquidCrystal.h>
+
+
+#define TRIGGER_PIN  10  // Se define que pin digital que funcionara como disparador.
+#define ECHO_PIN     9  // Se define el pin digital que funcionara como el que reciba el valor de rebote.
+#define MAX_DISTANCE 200 // Definimos la maxima distancia para el sensor, este modelo HC-SR04 es de 400 cm.
+
+// Inicializamos los numeros de interfaces de la pantalla lcd
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+int led = 13;      //Se guarda el numero del pin digital donde estara conectado el led
+int zumbador = 8; // Se guarda el numero del pin digital donde se encuentra el zumbador 
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // Inicializamos el sonar con los valores definidos. 
+
+void setup() {//Inicializamos las funciones que tendran las interfaces
+  lcd.begin(16, 2);
+  Serial.begin(115200); // Abrimos el terminal para ver los valores que votan las interfaces en 115200 baud
+  pinMode(led, OUTPUT);//Indicamos que el pin digital con el numero que guarda led(13) funcionara como una salida
+  pinMode(zumbador,OUTPUT); //Indicamos que el pin digital con el numero que guarda zumbador(8) funcionara como una salida
+}
+
+void loop() {//Cargamos el codigo que se repetira 
+  delay(500);                      // Añadimos el tiempo de espera para que se utilize el sonar en milisegundos 1000= 1seg.
+  unsigned int uS = sonar.ping(); // Guardamos los valores del sonar en uS para utilizarlo en la comparacion.
+  if(uS / US_ROUNDTRIP_CM <= 20) { //Preguntamos si uS redondeado a cm es menor a 20 cm si es verdad se considera que esta cerca
+    Serial.print("Invades mi espacio Personal");//Imprimimos en consola 
+    Serial.print(uS / US_ROUNDTRIP_CM); // Imprimos el valor del sonar guardado en uS en centimetros
+    Serial.println("cm");//Imprimimos cm para que se vea XD 
+    digitalWrite(led, HIGH);//Encendemos el led  
+    digitalWrite(zumbador, HIGH);//encendemos el zubamdor
+    lcd.println("Invades mi espacio Personal :");
+    delay(500);
+    lcd.clear();
+    lcd.print(uS / US_ROUNDTRIP_CM);
+    lcd.print(" cm");
+    delay(500);
+    lcd.clear();
+  }  
+  else {//Si esta mayor a 20 cm
+    Serial.print("Estas Lejos bitch"); //Imprimimos mensaje
+    Serial.print(uS / US_ROUNDTRIP_CM);// Imprimos el valor del sonar guardado en uS en centimetros
+    Serial.println("cm"); // Imprimos el valor del sonar guardado en uS en centimetros
+    digitalWrite(led, LOW); //Apagamos led
+    digitalWrite(zumbador, LOW);  // Apagamos zumbador
+    lcd.println("Estas Lejos bitch");
+    delay(500);
+    lcd.clear();
+    lcd.print(uS / US_ROUNDTRIP_CM);
+    lcd.print(" cm");
+    delay(500);
+    lcd.clear();
+  }
+}
